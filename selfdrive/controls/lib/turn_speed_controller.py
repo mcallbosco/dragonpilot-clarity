@@ -8,7 +8,7 @@ from selfdrive.controls.lib.drive_helpers import LIMIT_ADAPT_ACC, LIMIT_MIN_SPEE
 from selfdrive.modeld.constants import T_IDXS
 
 
-_ACTIVE_LIMIT_MIN_ACC = -0.5  # m/s^2 Maximum deceleration allowed while active.
+_ACTIVE_LIMIT_MIN_ACC = -0.4  # m/s^2 Maximum deceleration allowed while active.
 _ACTIVE_LIMIT_MAX_ACC = 0.5   # m/s^2 Maximum acelration allowed while active.
 
 

@@ -88,6 +88,7 @@ class CAR:
   INSIGHT = "HONDA INSIGHT 2019"
   HONDA_E = "HONDA E 2020"
   JADE = "HONDA JADE 2017"
+  CLARITY = "HONDA CLARITY 2018"
 
 FW_VERSIONS = {
   CAR.JADE: {(Ecu.esp, 0xfff, None): [b'\x00']},
@@ -1355,6 +1356,30 @@ FW_VERSIONS = {
       b'57114-TYF-E030\x00\x00'
     ],
   },
+  CAR.CLARITY: {
+    (Ecu.shiftByWire, 0x18da0bf1, None): [
+        b'54008-TRW-A910\x00\x00',
+    ],
+    (Ecu.vsa, 0x18da28f1, None): [
+        b'57114-TRW-A010\x00\x00',
+        b'57114-TRW-A020\x00\x00',
+    ],
+    (Ecu.eps, 0x18da30f1, None): [
+        b'39990-TRW-A020\x00\x00',
+        b'39990,TRW,A020\x00\x00', #3x modified firmware
+    ],
+    (Ecu.srs, 0x18da53f1, None): [
+        b'77959-TRW-A210\x00\x00',
+        b'77959-TRW-A220\x00\x00',
+    ],
+    (Ecu.gateway, 0x18daeff1, None): [
+        b'38897-TRW-A010\x00\x00',
+    ],
+    (Ecu.combinationMeter, 0x18da60f1, None): [
+        b'78109-TRW-A020\x00\x00',
+        b'78109-TRW-A030\x00\x00',
+    ],
+  },
 }
 
 DBC = {
@@ -1382,6 +1407,7 @@ DBC = {
   CAR.INSIGHT: dbc_dict('honda_insight_ex_2019_can_generated', None),
   CAR.HONDA_E: dbc_dict('acura_rdx_2020_can_generated', None),
   CAR.JADE: dbc_dict('honda_fit_ex_2018_can_generated', 'acura_ilx_2016_nidec'),
+  CAR.CLARITY: dbc_dict('honda_clarity_hybrid_2018_can_generated', 'acura_ilx_2016_nidec'),
 }
 
 STEER_THRESHOLD = {
