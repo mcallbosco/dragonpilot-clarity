@@ -1,5 +1,6 @@
 # This Python file uses the following encoding: utf-8
 # -*- coding: utf-8 -*-
+from cgitb import small
 from enum import IntEnum
 from typing import Dict, Union, Callable
 
@@ -546,6 +547,14 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
       "",
       AlertStatus.normal, AlertSize.small,
       Priority.LOW, VisualAlert.none, AudibleAlert.none, 2.),
+  },
+
+  EventName.maxBelowSpeedLimit: {
+    ET.WARNING: Alert(
+      "Max speed set below speed limit",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 2.),
   },
 
   EventName.speedLimitValueChange: {

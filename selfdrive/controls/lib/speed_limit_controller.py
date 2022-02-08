@@ -210,6 +210,7 @@ class SpeedLimitController():
     self._v_cruise_setpoint_prev = 0.
     self._v_cruise_setpoint_changed = False
     self._speed_limit = 0.
+    self._speed_under_notif_time = 0.
     self._speed_limit_prev = 0.
     self._speed_limit_changed = False
     self._distance = 0.
@@ -325,6 +326,9 @@ class SpeedLimitController():
     # adapting
     elif self.state == SpeedLimitControlState.adapting:
       # Go to active once the speed offset is over threshold.
+      # MCALL CHANGES
+      if (_speed_under_notif_time)
+      
       if self._v_offset >= LIMIT_SPEED_OFFSET_TH:
         self.state = SpeedLimitControlState.active
     # active
