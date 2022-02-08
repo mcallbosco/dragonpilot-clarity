@@ -37,6 +37,7 @@ _HIGHWAY_RANK = {
   'secondary_link': 31,
   'tertiary': 40,
   'tertiary_link': 41,
+  'service' :44,
   'unclassified': 50,
   'residential': 60,
   'living_street': 61,
