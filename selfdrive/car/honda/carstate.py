@@ -135,7 +135,7 @@ def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
   if CP.carFingerprint in (CAR.ACCORD, CAR.ACCORDH, CAR.INSIGHT, CAR.CLARITY):
     signals += [("LEAD_DISTANCE", "RADAR_HUD", 0)]
 
-  elif CP.carFingerprint == CAR.CLARITY:
+  if CP.carFingerprint == CAR.CLARITY:
     signals += [("EPB_STATE", "EPB_STATUS", 0),
                 ("BRAKE_ERROR_1", "BRAKE_ERROR", 0),
                 ("BRAKE_ERROR_2", "BRAKE_ERROR", 0)]
@@ -242,13 +242,12 @@ class CarState(CarStateBase):
     else:
       # dp - Rick - ignore check for crv_hybrid, loveloveses has issue with this signal.
 
-      if self.CP.carFingerprint in (CAR.CRV_HYBRID):
-        self.brake_error = 0
-      else:
-        self.brake_error = cp.vl["STANDSTILL"]["BRAKE_ERROR_1"] or cp.vl["STANDSTILL"]["BRAKE_ERROR_2"]
-    ret.espDisabled = cp.vl["VSA_STATUS"]["ESP_DISABLED"] != 0
-
-    
+        if self.CP.carFingerprint == CAR.CLARITY:
+          self.brake_error = cp.vl["BRAKE_ERROR"]["BRAKE_ERROR_1"] or cp.vl["BRAKE_ERROR"]["BRAKE_ERROR_2"]
+        else:
+          self.brake_error = cp.vl["STANDSTILL"]["BRAKE_ERROR_1"] or cp.vl["STANDSTILL"]["BRAKE_ERROR_2"]
+        ret.espDisabled = cp.vl["VSA_STATUS"]["ESP_DISABLED"] != 0
+      
     ret.wheelSpeeds = self.get_wheel_speeds(
       cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FL"],
       cp.vl["WHEEL_SPEEDS"]["WHEEL_SPEED_FR"],
