@@ -135,14 +135,7 @@ def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
   if CP.carFingerprint in (CAR.ACCORD, CAR.ACCORDH, CAR.INSIGHT, CAR.CLARITY):
     signals += [("LEAD_DISTANCE", "RADAR_HUD", 0)]
 
-  if CP.carFingerprint == CAR.CLARITY:
-    signals += [("EPB_STATE", "EPB_STATUS", 0),
-                ("BRAKE_ERROR_1", "BRAKE_ERROR", 0),
-                ("BRAKE_ERROR_2", "BRAKE_ERROR", 0)]
-    checks += [
-      ("BRAKE_ERROR", 100),
-      ("EPB_STATUS", 50),
-    ]
+  
 
   if CP.carFingerprint == CAR.CIVIC:
     signals += [("IMPERIAL_UNIT", "HUD_SETTING", 0),
@@ -155,6 +148,15 @@ def get_can_signals(CP, gearbox_msg, main_on_sig_msg):
     signals += [("EPB_STATUS", 0)]
     checks += [("EPB_STATUS", 50)]
 
+  elif CP.carFingerprint == CAR.CLARITY:
+    signals += [("EPB_STATE", "EPB_STATUS", 0),
+                ("BRAKE_ERROR_1", "BRAKE_ERROR", 0),
+                ("BRAKE_ERROR_2", "BRAKE_ERROR", 0)]
+    checks += [
+      ("BRAKE_ERROR", 100),
+      ("EPB_STATUS", 50),
+    ]
+  
   # add gas interceptor reading if we are using it
   if CP.enableGasInterceptor:
     signals.append(("INTERCEPTOR_GAS", "GAS_SENSOR", 0))
