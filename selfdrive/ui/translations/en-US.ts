@@ -136,11 +136,11 @@ Reboot required.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable EPS Mod Mode</source>
+        <source>Enable Clarity 3x EPS Mod Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable this will increase steering, USE IT ONLY if you have a modded EPS firmware.
+        <source>Enable this will increase steering, USE IT ONLY if you have a 3x modded EPS firmware.
 Reboot required.</source>
         <translation type="unfinished"></translation>
     </message>
