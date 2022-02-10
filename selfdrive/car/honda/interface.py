@@ -84,7 +84,9 @@ class CarInterface(CarInterfaceBase):
 
     eps_modified = False
     for fw in car_fw:
-      if fw.ecu == "eps" and b"," in fw.fwVersion:
+      if fw.ecu == "eps" and b"-" not in fw.fwVersion and b"," in fw.fwVersion:
+        Params().put_bool('dp_honda_eps_mod',True)
+      elif fw.ecu == "eps" and b"-" in fw.fwVersion and b"," in fw.fwVersion:
         eps_modified = True
 
     if candidate == CAR.CIVIC:
