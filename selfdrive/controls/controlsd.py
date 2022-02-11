@@ -10,6 +10,7 @@ from common.profiler import Profiler
 from common.params import Params, put_nonblocking
 import cereal.messaging as messaging
 from selfdrive.config import Conversions as CV
+from selfdrive.controls.lib import drive_helpers
 from selfdrive.swaglog import cloudlog
 from selfdrive.boardd.boardd import can_list_to_can_capnp
 from selfdrive.car.car_helpers import get_car, get_startup_event, get_one_can
@@ -419,7 +420,17 @@ class Controls:
 
     # if stock cruise is completely disabled, then we can use our own set speed logic
     if not self.CP.pcmCruise:
+      #MCALL CHANGE, If you try to set CC with gas pressed it updates the speed. 
       self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, CS.buttonEvents, self.button_timers, self.enabled, self.is_metric)
+      if (CS.gasPressed & CS.self.dragonconf.dpAllowGas) :
+        for b in CS.buttonEvents:
+          if (b.type == car.CarState.ButtonEvent.Type.decelCruise): 
+            self.v_cruise_kph = int(round(clip(CS.v_ego * CV.MS_TO_KPH, drive_helpers.V_CRUISE_ENABLE_MIN, drive_helpers.V_CRUISE_MAX)))
+
+
+
+
+
     elif self.CP.pcmCruise and CS.cruiseState.enabled:
       self.v_cruise_kph = CS.cruiseState.speed * CV.MS_TO_KPH
 
