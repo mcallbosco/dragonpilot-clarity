@@ -364,7 +364,7 @@ class SpeedLimitController():
     if self._state_prev <= SpeedLimitControlState.tempInactive:
       events.add(EventName.speedLimitActive)
     elif self._speed_limit_changed != 0:
-      if (self._v_cruise_setpoint < self._current_speed_limit):
+      if (self._v_cruise_setpoint < SpeedLimitResolver._current_speed_limit): #Mcall
         events.add(EventName.maxBelowSpeedLimit)
       else:
         events.add(EventName.speedLimitValueChange)
