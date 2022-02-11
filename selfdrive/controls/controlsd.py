@@ -420,17 +420,7 @@ class Controls:
 
     # if stock cruise is completely disabled, then we can use our own set speed logic
     if not self.CP.pcmCruise:
-      #MCALL CHANGE, If you try to set CC with gas pressed it updates the speed. 
       self.v_cruise_kph = update_v_cruise(self.v_cruise_kph, CS.buttonEvents, self.button_timers, self.enabled, self.is_metric)
-      if (CS.gasPressed & CS.self.dragonconf.dpAllowGas) :
-        for b in CS.buttonEvents:
-          if (b.type == car.CarState.ButtonEvent.Type.decelCruise): 
-            self.v_cruise_kph = int(round(clip(CS.v_ego * CV.MS_TO_KPH, drive_helpers.V_CRUISE_ENABLE_MIN, drive_helpers.V_CRUISE_MAX)))
-
-
-
-
-
     elif self.CP.pcmCruise and CS.cruiseState.enabled:
       self.v_cruise_kph = CS.cruiseState.speed * CV.MS_TO_KPH
 
