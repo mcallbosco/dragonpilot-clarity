@@ -69,7 +69,7 @@ class CarInterface(CarInterfaceBase):
     # For modeling details, see p.198-200 in "The Science of Vehicle Dynamics (2014), M. Guiggiani"
     ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0], [0]]
     ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
-    ret.lateralTuning.pid.kf = 0.00004  # conservative feed-forward
+    ret.lateralTuning.pid.kf = 0.00006  # conservative feed-forward
 
     if candidate in HONDA_BOSCH:
       ret.longitudinalTuning.kpV = [0.25]
@@ -84,7 +84,9 @@ class CarInterface(CarInterfaceBase):
 
     eps_modified = False
     for fw in car_fw:
-      if fw.ecu == "eps" and b"," in fw.fwVersion:
+      if fw.ecu == "eps" and b"-" not in fw.fwVersion and b"," in fw.fwVersion:
+        Params().put_bool('dp_honda_eps_mod',True)
+      elif fw.ecu == "eps" and b"-" in fw.fwVersion and b"," in fw.fwVersion:
         eps_modified = True
 
     if candidate == CAR.CIVIC:
@@ -324,8 +326,9 @@ class CarInterface(CarInterfaceBase):
       ret.centerToFront = ret.wheelbase * 0.4
       ret.steerRatio = 16.50  # 12.72 is end-to-end spec
       if eps_modified:
-        ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 0xA00, 0x3C00], [0, 2560, 3840]]
-        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1575], [0.05175]]
+        #2x
+        ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 0xA00, 0x2800], [0, 2560, 3840]]
+        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.3], [0.1]]
       else:
         ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 2560], [0, 2560]]
         ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.8], [0.24]]
@@ -383,6 +386,14 @@ class CarInterface(CarInterfaceBase):
         ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0x0, 0xB5, 0x161, 0x2D6, 0x4C0, 0x70D, 0xC42, 0x1058, 0x2C00], [0x0, 0x160, 0x1F0, 0x2E0, 0x378, 0x4A0, 0x5F0, 0x804, 0xF00]]
         ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.21], [0.07]] #still needs to finish tuning for the new car
         ret.lateralTuning.pid.kf = 0.00004
+        #This is where to do the 3x tune.
+      elif candidate == CAR.CLARITY:
+        print("USING CLARITY 3X EPS")
+        ret.lateralParams.torqueBP, ret.lateralParams.torqueV = [[0, 0xA00, 0x3C00], [0, 2560, 3840]]
+        ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1575], [0.05175]]
+        ret.lateralTuning.pid.kf = 0.00004
+
+
 
     ret = common_interface_get_params_lqr(ret)
 

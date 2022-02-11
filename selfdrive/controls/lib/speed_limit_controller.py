@@ -1,3 +1,4 @@
+from audioop import add
 import numpy as np
 import time
 from common.numpy_fast import interp
@@ -14,9 +15,9 @@ from selfdrive.modeld.constants import T_IDXS
 _PARAMS_UPDATE_PERIOD = 2.  # secs. Time between parameter updates.
 _TEMP_INACTIVE_GUARD_PERIOD = 1.  # secs. Time to wait after activation before considering temp deactivation signal.
 
-# Lookup table for speed limit percent offset depending on speed.
-_LIMIT_PERC_OFFSET_V = [0.0, 0.07, 0.11,  0.15, 0.15, 0.23]  # 25, 33, 45, 60, 67, 70 mph
-_LIMIT_PERC_OFFSET_BP = [7.0, 13.4, 20.1, 22.3, 24.58, 29.0]  # idk, 30, 40 50, 55, 65 mph
+# Lookup table for speed limit percent offset depending on speed. ~Mcall Version
+_LIMIT_PERC_OFFSET_V = [-0.03, 0.05, 0.05, 0.07] 
+_LIMIT_PERC_OFFSET_BP = [7.0, 12.0, 15.0, 24.14] #Values are in m/s
 
 #_LIMIT_PERC_OFFSET_V = [0.28, 0.038]  # 55, 105, 135 km/h 96, 129
 #_LIMIT_PERC_OFFSET_BP = [13.9, 36.1]  # 50, 100, 130 km/h
@@ -210,6 +211,7 @@ class SpeedLimitController():
     self._v_cruise_setpoint_prev = 0.
     self._v_cruise_setpoint_changed = False
     self._speed_limit = 0.
+    self._speed_under_notif_time = 0.
     self._speed_limit_prev = 0.
     self._speed_limit_changed = False
     self._distance = 0.
@@ -362,7 +364,10 @@ class SpeedLimitController():
     if self._state_prev <= SpeedLimitControlState.tempInactive:
       events.add(EventName.speedLimitActive)
     elif self._speed_limit_changed != 0:
-      events.add(EventName.speedLimitValueChange)
+      if (self._v_cruise_setpoint < self.speed_limit): #Mcall
+        events.add(EventName.maxBelowSpeedLimit)
+      else:
+        events.add(EventName.speedLimitValueChange)
 
   def update(self, enabled, v_ego, a_ego, sm, v_cruise_setpoint, events=Events()):
     self._op_enabled = enabled
