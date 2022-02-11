@@ -356,7 +356,7 @@ class SpeedLimitController():
     # Keep solution limited.
     self._a_target = np.clip(a_target, LIMIT_MIN_ACC, LIMIT_MAX_ACC)
 
-  def _update_events(self, events):
+  def _update_events(self, events, speedlimit):
     if not self.is_active:
       # no event while inactive
       return
@@ -364,7 +364,7 @@ class SpeedLimitController():
     if self._state_prev <= SpeedLimitControlState.tempInactive:
       events.add(EventName.speedLimitActive)
     elif self._speed_limit_changed != 0:
-      if (self._v_cruise_setpoint < self._speed_limit): #Mcall
+      if (self._v_cruise_setpoint < speedlimit): #Mcall
         events.add(EventName.maxBelowSpeedLimit)
       else:
         events.add(EventName.speedLimitValueChange)
@@ -382,4 +382,4 @@ class SpeedLimitController():
     self._update_calculations()
     self._state_transition()
     self._update_solution()
-    self._update_events(events)
+    self._update_events(events, self._speed_limit)
