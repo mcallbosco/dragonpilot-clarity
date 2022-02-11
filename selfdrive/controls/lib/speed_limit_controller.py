@@ -356,7 +356,7 @@ class SpeedLimitController():
     # Keep solution limited.
     self._a_target = np.clip(a_target, LIMIT_MIN_ACC, LIMIT_MAX_ACC)
 
-  def _update_events(self, events, speedlimit):
+  def _update_events(self, events):
     if not self.is_active:
       # no event while inactive
       return
