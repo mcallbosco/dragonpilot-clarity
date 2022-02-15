@@ -1,6 +1,15 @@
+
 . Chime when CC is set below the speed limit.  
 . Change the Tourqe mod to use the built in toggle.  interface.py
+
 . Remove other toggles that don't apply to this car. 
 . If you set CC without a previous speed, check to see if there's a speed limit that it can be set to.
 . See if there's a way to automatically set break hold to be enabled from ignition.
 . Look into using the SA faster lane notifications on highways. 'cf2d030de1f443261a0165ad600e01bda17556ed'
+
+PARTALLY IMPLIMENTED/NEEDS IMPROVEMENT:
+. Chime when CC is set below the speed limit.  
+
+
+DONE:
+. Change the Tourqe mod to use the built in toggle.
