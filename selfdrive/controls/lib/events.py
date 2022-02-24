@@ -433,6 +433,14 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
       Priority.HIGH, VisualAlert.steerRequired, AudibleAlert.warningImmediate, .1),
   },
 
+  EventName.manualSteeringRequired: {
+    ET.WARNING: Alert(
+      "STEERING REQUIRED: AutoSteer OFF",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1, alert_rate=0.25),
+  },
+
   EventName.manualRestart: {
     ET.WARNING: Alert(
       "TAKE CONTROL",
