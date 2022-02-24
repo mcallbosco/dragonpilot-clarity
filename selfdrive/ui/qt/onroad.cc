@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <QDebug>
+#include <QString>
 
 #include "selfdrive/common/timing.h"
 #include "selfdrive/ui/qt/util.h"
@@ -217,7 +218,158 @@ void OnroadHud::updateState(const UIState &s) {
     setProperty("engageable", cs.getEngageable() || cs.getEnabled());
     setProperty("dmActive", sm["driverMonitoringState"].getDriverMonitoringState().getIsActiveMode());
   }
+  if (Params().getBool("devUI")) {
+    const auto leadOne = sm["radarState"].getRadarState().getLeadOne();
+    setProperty("lead_d_rel", leadOne.getDRel());
+    setProperty("lead_v_rel", leadOne.getVRel());
+    setProperty("lead_status", leadOne.getStatus());
+    setProperty("angleSteers", sm["carState"].getCarState().getSteeringAngleDeg());
+
+    // If your car uses INDI or LQR, adjust this accordingly. -wirelessnet2
+    setProperty("steerAngleDesired", sm["controlsState"].getControlsState().getLateralControlState().getPidState().getSteeringAngleDesiredDeg());
+    setProperty("engineRPM", sm["carState"].getCarState().getEngineRPM());
+  }
 }
+int OnroadHud::devUiDrawElement(QPainter &p, int x, int y, const char* value, const char* label, const char* units, QColor &color) {
+  configFont(p, "Open Sans", 30 * 2, "SemiBold");
+  drawColoredText(p, x + 92, y + 80, QString(value), color);
+
+  configFont(p, "Open Sans", 28, "Regular");
+  drawText(p, x + 92, y + 80 + 42, QString(label), 255);
+
+  if (strlen(units) > 0) {
+    p.save();
+    p.translate(x + 54 + 30 - 3 + 92, y + 37 + 25);
+    p.rotate(-90);
+    drawText(p, 0, 0, QString(units), 255);
+    p.restore();
+  }
+  return 110;
+}
+void OnroadHud::drawLeftDevUi(QPainter &p, int x, int y) {
+  int rh = 5;
+  int ry = y;
+
+  // Add Relative Distance to Primary Lead Car
+  // Unit: Meters
+  if (true) {
+    char val_str[8];
+    char units_str[8];
+    QColor valueColor = QColor(255, 255, 255, 255);
+
+    if (lead_status) {
+      // Orange if close, Red if very close
+      if (lead_d_rel < 5) {
+        valueColor = QColor(255, 0, 0, 255); 
+      } else if (lead_d_rel < 15) {
+        valueColor = QColor(255, 188, 0, 255);
+      }
+      snprintf(val_str, sizeof(val_str), "%d", (int)lead_d_rel);
+    } else {
+      snprintf(val_str, sizeof(val_str), "-");
+    }
+
+    snprintf(units_str, sizeof(units_str), "m");
+
+    rh += devUiDrawElement(p, x, ry, val_str, "REL DIST", units_str, valueColor);
+    ry = y + rh;
+  }
+
+  // Add Relative Velocity vs Primary Lead Car
+  // Unit: kph if metric, else mph
+  if (true) {
+    char val_str[8];
+    QColor valueColor = QColor(255, 255, 255, 255);
+
+     if (lead_status) {
+       // Red if approaching faster than 10mph
+       // Orange if approaching (negative)
+       if (lead_v_rel < -4.4704) {
+        valueColor = QColor(255, 0, 0, 255); 
+       } else if (lead_v_rel < 0) {
+         valueColor = QColor(255, 188, 0, 255);
+       }
+
+       if (speedUnit == "mph") {
+         snprintf(val_str, sizeof(val_str), "%d", (int)(lead_v_rel * 2.236936)); //mph
+       } else {
+         snprintf(val_str, sizeof(val_str), "%d", (int)(lead_v_rel * 3.6)); //kph
+       }
+     } else {
+       snprintf(val_str, sizeof(val_str), "-");
+     }
+
+    rh += devUiDrawElement(p, x, ry, val_str, "REL SPEED", speedUnit.toStdString().c_str(), valueColor);
+    ry = y + rh;
+  }
+
+  // Add Real Steering Angle
+  // Unit: Degrees
+  if (true) {
+    char val_str[8];
+    QColor valueColor = QColor(255, 255, 255, 255);
+
+    // Red if large steering angle
+    // Orange if moderate steering angle
+    if (std::fabs(angleSteers) > 12) {
+      valueColor = QColor(255, 0, 0, 255);
+    } else if (std::fabs(angleSteers) > 6) {
+      valueColor = QColor(255, 188, 0, 255);
+    }
+
+    snprintf(val_str, sizeof(val_str), "%.0f%s%s", angleSteers , "°", "");
+
+    rh += devUiDrawElement(p, x, ry, val_str, "REAL STEER", "", valueColor);
+    ry = y + rh;
+  }
+
+  // Add Desired Steering Angle
+  // Unit: Degrees
+  if (true) {
+    char val_str[8];
+    QColor valueColor = QColor(255, 255, 255, 255);
+
+    if (status != STATUS_DISENGAGED) {
+      // Red if large steering angle
+      // Orange if moderate steering angle
+      if (std::fabs(angleSteers) > 12) {
+        valueColor = QColor(255, 0, 0, 255);
+      } else if (std::fabs(angleSteers) > 6) {
+        valueColor = QColor(255, 188, 0, 255);
+      }
+
+      snprintf(val_str, sizeof(val_str), "%.0f%s%s", steerAngleDesired, "°", "");
+    } else {
+      snprintf(val_str, sizeof(val_str), "-");
+    }
+
+    rh += devUiDrawElement(p, x, ry, val_str, "DESIR STEER", "", valueColor);
+    ry = y + rh;
+  }
+
+  // Add Engine RPM
+  // Unit: RPM
+  if (true) {
+    char val_str[8];
+    QColor valueColor = QColor(255, 255, 255, 255);
+
+    if(engineRPM == 0) {
+      snprintf(val_str, sizeof(val_str), "OFF");
+    } else {
+      snprintf(val_str, sizeof(val_str), "%d", (engineRPM));
+    }
+
+    rh += devUiDrawElement(p, x, ry, val_str, "ENG RPM", "", valueColor);
+    ry = y + rh;
+  }
+
+  rh += 25;
+  p.setBrush(QColor(0, 0, 0, 0));
+  QRect ldu(x, y, 184, rh);
+  p.drawRoundedRect(ldu, 20, 20); 
+} 
+
+
 
 void OnroadHud::paintEvent(QPaintEvent *event) {
   QPainter p(this);
@@ -260,8 +412,14 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
   // dm icon
   if (!hideDM) {
+    if (Params().getBool("devUI")){
+    drawLeftDevUi(p, bdr_s * 2, bdr_s * 2 + rc.height());
+    drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 3.5,
+          dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
+    } else {
     drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
              dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
+    }
   }
 }
 
@@ -272,6 +430,16 @@ void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, int alp
   real_rect.moveCenter({x, y - real_rect.height() / 2});
 
   p.setPen(QColor(0xff, 0xff, 0xff, alpha));
+  p.drawText(real_rect.x(), real_rect.bottom(), text);
+}
+
+void OnroadHud::drawColoredText(QPainter &p, int x, int y, const QString &text, QColor &color) {
+  QFontMetrics fm(p.font());
+  QRect init_rect = fm.boundingRect(text);
+  QRect real_rect = fm.boundingRect(init_rect, 0, text);
+  real_rect.moveCenter({x, y - real_rect.height() / 2});
+
+  p.setPen(color);
   p.drawText(real_rect.x(), real_rect.bottom(), text);
 }
 

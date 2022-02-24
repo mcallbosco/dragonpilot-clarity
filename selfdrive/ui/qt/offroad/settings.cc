@@ -71,6 +71,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Disengage openpilot on gas pedal press.",
       "../assets/offroad/icon_speed_limit.png",
     },
+    {
+      "devUI",
+      "Enable Dev UI",
+      "Enables WN2's Dev UI",
+      "../assets/offroad/icon_speed_limit.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",

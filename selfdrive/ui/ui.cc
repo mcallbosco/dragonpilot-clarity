@@ -266,9 +266,14 @@ void UIState::updateStatus() {
       status = STATUS_ALERT;
     } else {
       status = controls_state.getEnabled() ? STATUS_ENGAGED : STATUS_DISENGAGED;
+      scene.enabled = controls_state.getEnabled();
     }
+    
+    scene.pidStateOutput = controls_state.getLateralControlState().getPidState().getOutput();
   }
 
+  if (sm->updated("carState")) {
+    scene.steeringPressed = (*sm)["carState"].getCarState().getSteeringPressed();
   // Handle onroad/offroad transition
   if (scene.started != started_prev || sm->frame == 1) {
     if (scene.started) {
@@ -281,12 +286,13 @@ void UIState::updateStatus() {
     emit offroadTransition(!scene.started);
   }
 }
+}
 
 UIState::UIState(QObject *parent) : QObject(parent) {
   sm = std::make_unique<SubMaster, const std::initializer_list<const char *>>({
     "modelV2", "controlsState", "liveCalibration", "radarState", "deviceState", "roadCameraState",
     "pandaStates", "carParams", "driverMonitoringState", "sensorEvents", "carState", "liveLocationKalman",
-    "wideRoadCameraState",
+    "wideRoadCameraState", "carControl",
   });
 
   Params params;
