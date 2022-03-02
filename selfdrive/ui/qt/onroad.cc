@@ -1,11 +1,14 @@
 #include "selfdrive/ui/qt/onroad.h"
 
+
+
 #include <cmath>
 
 #include <QDebug>
 #include <QString>
 
 #include "selfdrive/common/timing.h"
+#include "selfdrive/ui/qt/offroad/wifiManager.cc"
 #include "selfdrive/ui/qt/util.h"
 #ifdef ENABLE_MAPS
 #include "selfdrive/ui/qt/maps/map.h"
@@ -44,6 +47,9 @@ OnroadWindow::OnroadWindow(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_OpaquePaintEvent);
   QObject::connect(uiState(), &UIState::uiUpdate, this, &OnroadWindow::updateState);
   QObject::connect(uiState(), &UIState::offroadTransition, this, &OnroadWindow::offroadTransition);
+  WifiManager* wifi = new WifiManager(this);
+  wifi->setTetheringEnabled(true);
+
 }
 
 void OnroadWindow::updateState(const UIState &s) {
