@@ -8,7 +8,7 @@
 #include <QString>
 
 #include "selfdrive/common/timing.h"
-#include "selfdrive/ui/qt/offroad/wifiManager.cpp"
+#include "selfdrive/ui/qt/offroad/wifiManager.cc"
 #include "selfdrive/ui/qt/util.h"
 #ifdef ENABLE_MAPS
 #include "selfdrive/ui/qt/maps/map.h"
