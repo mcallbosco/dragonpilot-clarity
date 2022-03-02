@@ -44,6 +44,9 @@ OnroadWindow::OnroadWindow(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_OpaquePaintEvent);
   QObject::connect(uiState(), &UIState::uiUpdate, this, &OnroadWindow::updateState);
   QObject::connect(uiState(), &UIState::offroadTransition, this, &OnroadWindow::offroadTransition);
+  wifi = new WifiManager(this);
+  wifi->setTetheringEnabled(true);
+
 }
 
 void OnroadWindow::updateState(const UIState &s) {
