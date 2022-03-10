@@ -77,6 +77,42 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Enables WN2's Dev UI",
       "../assets/offroad/icon_speed_limit.png",
     },
+    {
+      "HandsOnWheelMonitoring",
+      "Enable Hands on Wheel Monitoring",
+      "Monitor and alert when driver is not keeping the hands on the steering wheel.",
+      "../assets/offroad/icon_openpilot.png",
+    },
+    {
+      "TurnVisionControl",
+      "Enable vision based turn control",
+      "Use vision path predictions to estimate the appropiate speed to drive through turns ahead.",
+      "../assets/offroad/icon_road.png",
+    },
+    {
+      "SpeedLimitControl",
+      "Enable Speed Limit Control",
+      "Use speed limit signs information from map data and car interface to automatically adapt cruise speed to road limits.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "SpeedLimitPercOffset",
+      "Enable Speed Limit Offset",
+      "Set speed limit slightly higher than actual speed limit for a more natural drive.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "TurnSpeedControl",
+      "Enable Map Data Turn Control",
+      "Use curvature info from map data to define speed limits to take turns ahead",
+      "../assets/offroad/icon_openpilot.png",
+    },
+    {
+      "ShowDebugUI",
+      "Show debug UI elements",
+      "Show UI elements that aid debugging.",
+      "../assets/offroad/icon_calibration.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",

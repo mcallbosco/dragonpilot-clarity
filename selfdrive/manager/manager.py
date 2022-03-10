@@ -40,7 +40,13 @@ def manager_init() -> None:
     ("CompletedTrainingVersion", "0"),
     ("DisengageOnGas", "1"),
     ("HasAcceptedTerms", "0"),
+    ("HandsOnWheelMonitoring", "0"),
     ("OpenpilotEnabledToggle", "1"),
+    ("ShowDebugUI", "1"),
+    ("SpeedLimitControl", "1"),
+    ("SpeedLimitPercOffset", "1"),
+    ("TurnSpeedControl", "1"),
+    ("TurnVisionControl", "1"),
   ]
   if not PC:
     default_params.append(("LastUpdateTime", datetime.datetime.utcnow().isoformat().encode('utf8')))
@@ -55,6 +61,10 @@ def manager_init() -> None:
   for k, v in default_params:
     if params.get(k) is None:
       params.put(k, v)
+
+  # parameters set by Enviroment Varables
+  if os.getenv("HANDSMONITORING") is not None:
+    params.put_bool("HandsOnWheelMonitoring", bool(int(os.getenv("HANDSMONITORING", "0"))))
 
   # is this dashcam?
   if os.getenv("PASSIVE") is not None:
