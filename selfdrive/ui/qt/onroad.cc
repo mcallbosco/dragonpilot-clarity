@@ -10,7 +10,7 @@
 #include <QPainterPath>
 
 #include "selfdrive/common/timing.h"
-#include "selfdrive/ui/qt/offroad/wifiManager.cc"
+#include "selfdrive/ui/qt/offroad/wifiManager.h"
 #include "selfdrive/ui/qt/util.h"
 #ifdef ENABLE_MAPS
 #include "selfdrive/ui/qt/maps/map.h"
@@ -49,9 +49,10 @@ OnroadWindow::OnroadWindow(QWidget *parent) : QWidget(parent) {
   setAttribute(Qt::WA_OpaquePaintEvent);
   QObject::connect(uiState(), &UIState::uiUpdate, this, &OnroadWindow::updateState);
   QObject::connect(uiState(), &UIState::offroadTransition, this, &OnroadWindow::offroadTransition);
-  WifiManager* wifi = new WifiManager(this);
-  wifi->setTetheringEnabled(true);
-
+  if(Params().getBool("tetherOnRoad")){
+    WifiManager* wifi = new WifiManager(this);
+    wifi->setTetheringEnabled(true);
+  }
 }
 
 void OnroadWindow::updateState(const UIState &s) {
@@ -86,38 +87,33 @@ bool ptInBiggerRect(Rect const & r, QMouseEvent* e){
 }
 
 void OnroadWindow::mousePressEvent(QMouseEvent* e) {
-  if (map != nullptr) {
-    bool sidebarVisible = geometry().x() > 0;
-    if (!sidebarVisible){
-      // prevent nav from showing if a tappable ui element has been tapped
-      bool ignorePress = false;
-      ignorePress = ignorePress || ptInBiggerRect(uiState()->scene.screen_dim_touch_rect, e);
-      if (!ignorePress){
-        map->setVisible(!map->isVisible());
-      }
-    }
-  }
+  bool ignorePress = false;
+  ignorePress = ignorePress || ptInBiggerRect(uiState()->scene.screen_dim_touch_rect, e) ;
+
   bool sidebarVisible = geometry().x() > 0;
   bool propagate_event = true;
 
     // Toggle speed limit control enabled
   SubMaster &sm = *(uiState()->sm);
   auto longitudinal_plan = sm["longitudinalPlan"].getLongitudinalPlan();
-  const QRect speed_limit_touch_rect = speed_sgn_rc.adjusted(-50, -50, 50, 50);
+  const QRect speed_limit_touch_rect(bdr_s * 2, bdr_s * 1.5, 552, 202);
 
   if (longitudinal_plan.getSpeedLimit() > 0.0 && speed_limit_touch_rect.contains(e->x(), e->y())) {
     // If touching the speed limit sign area when visible
     uiState()->scene.last_speed_limit_sign_tap = seconds_since_boot();
     uiState()->scene.speed_limit_control_enabled = !uiState()->scene.speed_limit_control_enabled;
     Params().putBool("SpeedLimitControl", uiState()->scene.speed_limit_control_enabled);
-    propagate_event = false;
+    ignorePress = true;
   }
-  else if (map != nullptr) {
+  if (map != nullptr && !ignorePress) {
+    
     map->setVisible(!sidebarVisible && !map->isVisible());
+    Params().putBool("ShowingMap", map->isVisible());
+
   }
 
   // propagation event to parent(HomeWindow)
-  if (propagate_event) {
+  if (propagate_event && !ignorePress) {
     QWidget::mousePressEvent(e);
   }
 }
@@ -236,7 +232,7 @@ void OnroadHud::updateState(const UIState &s) {
   if (cruise_set && !s.scene.is_metric) {
     maxspeed *= KM_TO_MILE;
   }
-  QString maxspeed_str = cruise_set ? QString::number(std::nearbyint(maxspeed)) : "N/A";
+  QString maxspeed_str = cruise_set ? QString::number(std::nearbyint(maxspeed)) : "-";
   float cur_speed = std::max(0.0, sm["carState"].getCarState().getVEgo() * (s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH));
 
   setProperty("is_cruise_set", cruise_set);
@@ -292,6 +288,7 @@ void OnroadHud::updateState(const UIState &s) {
     setProperty("speedLimit", QString::number(std::nearbyint(speed_limit)));
     setProperty("slcSubText", sl_substring);
     setProperty("slcSubTextSize", sl_inactive || sl_temp_inactive || sl_distance > 0 ? 22.2 : 37.0);
+    setProperty("speedLimitOffset", QString::number(std::nearbyint(speed_limit_offset)));
     setProperty("mapSourcedSpeedLimit", lp.getIsMapSpeedLimit());
     setProperty("slcActive", !sl_inactive && !sl_temp_inactive);
 
@@ -469,21 +466,96 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   bg.setColorAt(1, QColor::fromRgbF(0, 0, 0, 0));
   p.fillRect(0, 0, width(), header_h, bg);
 
-  // max speed
-  QRect rc(bdr_s * 2, bdr_s * 1.5, 184, 202);
-  p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
-  p.setBrush(QColor(0, 0, 0, 100));
-  p.drawRoundedRect(rc, 20, 20);
-  p.setPen(Qt::NoPen);
+  if (Params().getBool("ShowMcallUI") && !(Params().getBool("ShowingMap"))){    // max speed
+    // max speed
+    QRect rc(bdr_s * 2, bdr_s * 1.5, 552, 202);
+    p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+    p.setBrush(QColor(0, 0, 0, 100));
+    p.drawRoundedRect(rc, 20, 20);
+    p.drawLine(rc.center().x()-(rc.width()/2)+(rc.width()/3)-10,bdr_s * 1.5, rc.center().x()-(rc.width()/2)+(rc.width()/3)-10, bdr_s * 1.5 + rc.height());
+    p.drawLine(rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-10,bdr_s * 1.5,rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-10, bdr_s * 1.5 + rc.height());
+    p.setPen(Qt::NoPen);
 
-  configFont(p, "Open Sans", 48, "Regular");
-  drawText(p, rc.center().x(), 118, "MAX", is_cruise_set ? 200 : 100);
-  if (is_cruise_set) {
-    configFont(p, "Open Sans", 88, "Bold");
-    drawText(p, rc.center().x(), 212, maxSpeed, 255);
-  } else {
-    configFont(p, "Open Sans", 80, "SemiBold");
-    drawText(p, rc.center().x(), 212, maxSpeed, 100);
+
+  // MCALL CHANGE!!!!
+    configFont(p, "Open Sans", 48, "Regular");
+    drawText(p, rc.center().x()-(rc.width()/2)+(rc.width()/3)-(rc.width()/6), 118, "MAX", is_cruise_set ? 200 : 100);
+    if (is_cruise_set) {
+      configFont(p, "Open Sans", 88, "Bold");
+      drawText(p, rc.center().x()-(rc.width()/2)+(rc.width()/3)-(rc.width()/6), 212, maxSpeed, 255);
+    } else {
+      configFont(p, "Open Sans", 80, "SemiBold");
+      drawText(p, rc.center().x()-(rc.width()/2)+(rc.width()/3)-(rc.width()/6), 212, maxSpeed, 100);
+    }
+
+
+    //Mcall Speed Limit
+    configFont(p, "Open Sans", 48, "Regular");
+    drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 118, "LMT", slcActive && showSpeedLimit ? 200 : 100);
+    if (showSpeedLimit) {
+      if (slcActive) {
+        p.setBrush(QColor(0, 0, 0, 100));
+        configFont(p, "Open Sans", 88, "Bold");
+        drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 212, speedLimit, 255);
+      } else {
+        configFont(p, "Open Sans", 80, "Bold");
+        drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 212, speedLimit, 100);
+      }
+    } else {
+      configFont(p, "Open Sans", 80, "SemiBold");
+      drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 212, "-", 100);
+    }
+
+
+    //Target Speed
+    configFont(p, "Open Sans", 48, "Regular");
+    drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*3)-(rc.width()/6), 118, "TRG", (is_cruise_set && status != STATUS_DISENGAGED) ? 200 : 100);
+
+    //targetSpeedNumberCalc
+
+    int trgSpeed = 0;
+    if (showVTC){
+      configFont(p, "Open Sans", 88, "Bold");
+      trgSpeed = vtcSpeed.toInt();
+    } else if (tscActive && (maxSpeed >= turnSpeedLimit)){
+      configFont(p, "Open Sans", 88, "Bold");
+      trgSpeed = turnSpeedLimit.toInt();
+    } else if (showSpeedLimit && slcActive && maxSpeed >= speedLimit + speedLimitOffset) {
+        configFont(p, "Open Sans", 88, "Bold");
+        trgSpeed = speedLimit.toInt() + speedLimitOffset.toInt();
+    } else if (status != STATUS_DISENGAGED) {
+      configFont(p, "Open Sans", 88, "Bold");
+      trgSpeed = maxSpeed.toInt();
+    } else {
+      configFont(p, "Open Sans", 80, "SemiBold");
+      trgSpeed = 0;
+    }
+    if (is_cruise_set && trgSpeed != 0) {
+      configFont(p, "Open Sans", 88, "Bold");
+      drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*3)-(rc.width()/6), 212, QString::number(trgSpeed) , 255);
+    } else {
+      configFont(p, "Open Sans", 80, "SemiBold");
+      drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*3)-(rc.width()/6), 212, "-", 100);
+    }
+
+  }
+  else {
+        // max speed
+    QRect rc(bdr_s * 2, bdr_s * 1.5, 184, 202);
+    p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+    p.setBrush(QColor(0, 0, 0, 100));
+    p.drawRoundedRect(rc, 20, 20);
+    p.setPen(Qt::NoPen);
+
+    configFont(p, "Open Sans", 48, "Regular");
+    drawText(p, rc.center().x(), 118, "MAX", is_cruise_set ? 200 : 100);
+    if (is_cruise_set) {
+      configFont(p, "Open Sans", 88, "Bold");
+      drawText(p, rc.center().x(), 212, maxSpeed, 255);
+    } else {
+      configFont(p, "Open Sans", 80, "SemiBold");
+      drawText(p, rc.center().x(), 212, maxSpeed, 100);
+    }
   }
 
   // current speed
@@ -493,13 +565,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   drawText(p, rect().center().x(), 290, speedUnit, 200);
 
   if (engageable) {
-    if (showDebugUI && showVTC) {
-      drawVisionTurnControllerUI(p, rect().right() - 184 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, vtcSpeed, 100);
-    } else {
       // engage-ability icon
       drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, radius / 2 + int(bdr_s * 1.5),
                engage_img, bg_colors[status], 1.0);
-    }
+    
     
     // Hands on wheel icon
     if (showHowAlert) {
@@ -507,22 +576,25 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
                how_img, bg_colors[howWarning ? STATUS_WARNING : STATUS_ALERT], 1.0);
     }
 
-    // Speed Limit Sign
+    /* Speed Limit Sign
     if (showSpeedLimit) {
-      drawSpeedSign(p, speed_sgn_rc, speedLimit, slcSubText, slcSubTextSize, mapSourcedSpeedLimit, slcActive);
+      QRect spdlimit(rect().right() - bdr_s * 2,  bdr_s * 2.5 + 202, 184, 184);
+      drawSpeedSign(p, spdlimit , speedLimit, slcSubText, slcSubTextSize, mapSourcedSpeedLimit, slcActive);
     }
 
     // Turn Speed Sign
     if (showTurnSpeedLimit) {
-      rc.moveTop(speed_sgn_rc.bottom() + bdr_s);
-      drawTrunSpeedSign(p, rc, turnSpeedLimit, tscSubText, curveSign, tscActive);
+      QRect spdlimit(rect().right() - bdr_s * 2,  bdr_s * 2.5 + 386, 184, 184);
+      drawTrunSpeedSign(p, spdlimit, turnSpeedLimit, tscSubText, curveSign, tscActive);
     }
+    */
   }
+
 
   // dm icon
   if (!hideDM) {
     if (Params().getBool("devUI")){
-    drawLeftDevUi(p, bdr_s * 2, bdr_s * 2 + rc.height());
+    drawLeftDevUi(p, bdr_s * 2, bdr_s * 2 + 202);
     drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 3.5,
           dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
     } else {

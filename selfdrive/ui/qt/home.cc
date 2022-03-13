@@ -7,6 +7,7 @@
 
 #include "selfdrive/common/params.h"
 #include "selfdrive/ui/qt/util.h"
+#include "selfdrive/ui/qt/offroad/wifiManager.h"
 #include "selfdrive/ui/qt/widgets/drive_stats.h"
 #include "selfdrive/ui/qt/widgets/prime.h"
 
@@ -37,6 +38,12 @@ HomeWindow::HomeWindow(QWidget* parent) : QWidget(parent) {
   slayout->addWidget(driver_view);
   setAttribute(Qt::WA_NoSystemBackground);
   QObject::connect(uiState(), &UIState::offroadTransition, this, &HomeWindow::offroadTransition);
+  
+  if(Params().getBool("tetherOnRoad")){
+    WifiManager* wifi = new WifiManager(this);
+    wifi->setTetheringEnabled(false);
+  }
+  
 }
 
 void HomeWindow::showSidebar(bool show) {

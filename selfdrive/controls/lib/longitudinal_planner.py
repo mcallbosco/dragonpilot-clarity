@@ -160,7 +160,7 @@ class Planner:
     self.vision_turn_controller.update(enabled, v_ego, a_ego, v_cruise, sm)
     self.events = Events()
     self.speed_limit_controller.update(enabled, v_ego, a_ego, sm, v_cruise, self.events)
-    self.turn_speed_controller.update(enabled, v_ego, a_ego, sm)
+    self.turn_speed_controller.update(enabled, v_ego, a_ego, sm, self.events)
 
     # Pick solution with lowest velocity target.
     a_solutions = {'cruise': float("inf")}

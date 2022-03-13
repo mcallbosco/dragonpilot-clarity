@@ -355,11 +355,17 @@ class SpeedLimitController():
     if not self.is_active:
       # no event while inactive
       return
-
-    if self._state_prev <= SpeedLimitControlState.tempInactive:
-      events.add(EventName.speedLimitActive)
+    if self._state_prev <= SpeedLimitControlState.tempInactive and self._speed_limit_changed == 0:
+        events.add(EventName.speedLimitActive)
     elif self._speed_limit_changed != 0:
+      if (self._v_cruise_setpoint < self.speed_limit and self._params.get_bool("AudableMapD") ): #Mcall
+        events.add(EventName.speedLimitBelowCC)
+      else:
+        events.add(EventName.speedLimitValueChange)
+    if (self.distance != 0):
       events.add(EventName.speedLimitValueChange)
+
+
 
   def update(self, enabled, v_ego, a_ego, sm, v_cruise_setpoint, events=Events()):
     self._op_enabled = enabled

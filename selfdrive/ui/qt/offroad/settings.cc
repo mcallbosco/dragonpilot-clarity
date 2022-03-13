@@ -109,9 +109,28 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
     },
     {
       "ShowDebugUI",
-      "Show debug UI elements",
-      "Show UI elements that aid debugging.",
+      "Show Road Name",
+      "Show road name on the bottom of the Onroad Screen.",
       "../assets/offroad/icon_calibration.png",
+    },
+    {
+      "ShowMcallUI",
+      "Show Mcall UI",
+      "UI tweaks and enhancements by me!",
+      "../assets/offroad/icon_calibration.png",
+    },
+    {
+      "AudableMapD",
+      "Enable Audio Chimes for MapD Stuff",
+      "Enables audio chimes for a map based turn slowdown and if your CC is set below the speed limit!",
+      "../assets/offroad/icon_calibration.png",
+    },
+
+    {
+      "tetherOnRoad",
+      "Enable Automatic Tethering Onroad",
+      "This will not work if the device is connected to another wifi network. Hopefully I will fix this.",
+      "../assets/offroad/icon_speed_limit.png",
     },
 #ifdef ENABLE_MAPS
     {
@@ -119,6 +138,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Show ETA in 24h format",
       "Use 24h format instead of am/pm",
       "../assets/offroad/icon_metric.png",
+    },
+    {
+      "ShowingMap",
+      "Show Map",
+      "Wanna show the map? Do this! It's for debug",
+      "../assets/offroad/icon_calibration.png",
     },
 #endif
 

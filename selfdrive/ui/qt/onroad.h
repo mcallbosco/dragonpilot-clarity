@@ -38,6 +38,8 @@ class OnroadHud : public QWidget {
 
   Q_PROPERTY(bool showSpeedLimit MEMBER showSpeedLimit NOTIFY valueChanged);
   Q_PROPERTY(QString speedLimit MEMBER speedLimit NOTIFY valueChanged);
+  Q_PROPERTY(QString speedLimitOffset MEMBER speedLimitOffset NOTIFY valueChanged);
+
   Q_PROPERTY(QString slcSubText MEMBER slcSubText NOTIFY valueChanged);
   Q_PROPERTY(float slcSubTextSize MEMBER slcSubTextSize NOTIFY valueChanged);
   Q_PROPERTY(bool mapSourcedSpeedLimit MEMBER mapSourcedSpeedLimit NOTIFY valueChanged);
@@ -106,6 +108,7 @@ private:
   bool showSpeedLimit = false;
   QString speedLimit;
   QString slcSubText;
+  QString speedLimitOffset;
   float slcSubTextSize = 0.0;
   bool mapSourcedSpeedLimit = false;
   bool slcActive = false;

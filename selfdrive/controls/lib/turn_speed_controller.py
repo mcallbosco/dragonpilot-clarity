@@ -1,3 +1,4 @@
+from turtle import distance
 import numpy as np
 import time
 from common.params import Params
@@ -6,6 +7,10 @@ from common.realtime import sec_since_boot
 from selfdrive.controls.lib.drive_helpers import LIMIT_ADAPT_ACC, LIMIT_MIN_SPEED, LIMIT_MAX_MAP_DATA_AGE, \
   LIMIT_SPEED_OFFSET_TH, CONTROL_N, LIMIT_MIN_ACC, LIMIT_MAX_ACC
 from selfdrive.modeld.constants import T_IDXS
+from selfdrive.controls.lib.events import Events
+from cereal import log, car
+
+
 
 
 _ACTIVE_LIMIT_MIN_ACC = -0.5  # m/s^2 Maximum deceleration allowed while active.
@@ -50,6 +55,9 @@ class TurnSpeedController():
     self._distance = 0.
     self._turn_sign = 0
     self._state = TurnSpeedControlState.inactive
+    self._notifyEvent = False
+    self._firstNotifyDone = False
+
 
     self._next_speed_limit_prev = 0.
 
@@ -230,7 +238,7 @@ class TurnSpeedController():
     # update solution values.
     self._a_target = a_target
 
-  def update(self, enabled, v_ego, a_ego, sm):
+  def update(self, enabled, v_ego, a_ego, sm, events=Events()):
     self._op_enabled = enabled
     self._v_ego = v_ego
     self._a_ego = a_ego
@@ -242,3 +250,20 @@ class TurnSpeedController():
     self._update_calculations()
     self._state_transition(sm)
     self._update_solution()
+
+    if ((self.state == TurnSpeedControlState.active or TurnSpeedControlState.adapting) and self._notifyEvent == False and self._distance != 0):
+      self._notifyEvent = True
+      EventName = car.CarEvent.EventName
+      if (self._firstNotifyDone == False and self._params.get_bool("AudableMapD")): 
+        events.add(EventName.slowingForOSMCurveSound)
+      else:
+        events.add(EventName.slowingForOSMCurve)
+      self._firstNotifyDone = True
+    else:
+      self._notifyEvent = False
+
+    if(distance == 0):
+      self._firstNotifyDone = False
+
+
+
