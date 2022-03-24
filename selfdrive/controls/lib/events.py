@@ -264,6 +264,43 @@ def joystick_alert(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, sof
   vals = f"Gas: {round(gb * 100.)}%, Steer: {round(steer * 100.)}%"
   return NormalPermanentAlert("Joystick Mode", vals)
 
+def speed_limit_adjust_alert(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
+  speedLimit = sm['longitudinalPlan'].speedLimit
+  speedLimitDist =sm['longitudinalPlan'].distToSpeedLimit
+  speed = round(speedLimit * (CV.MS_TO_KPH if metric else CV.MS_TO_MPH))
+  if (speedLimitDist == 0):
+    message = f'Speed limit set to {speed} {"km/h" if metric else "mph"}'
+  else: 
+    message = f'Adjusting to {speed} {"km/h" if metric else "mph"} speed limit in {round(speedLimitDist)} meters'
+
+  return Alert(
+    message,
+    "",
+    AlertStatus.normal, AlertSize.small,
+    Priority.LOW, VisualAlert.none, AudibleAlert.none, 4.)
+
+def OSM_Curve_Alert(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
+  turnSpeedThis = sm['longitudinalPlan'].turnSpeed
+  distToTurnThis = sm['longitudinalPlan'].distToTurn
+  speed = round(turnSpeedThis * (CV.MS_TO_KPH if metric else CV.MS_TO_MPH))
+  message = f'Map Based Turn Adjustment \n Adjusting to {speed} {"km/h" if metric else "mph"} for turn in {round(distToTurnThis)} meters'
+  return Alert(
+    message,
+    "",
+    AlertStatus.normal, AlertSize.small,
+    Priority.LOW, VisualAlert.none, AudibleAlert.none, 4.)
+
+  
+def OSM_Curve_Alert_Sound(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
+  turnSpeedThis = sm['longitudinalPlan'].turnSpeed
+  distToTurnThis = sm['longitudinalPlan'].distToTurn
+  speed = round(turnSpeedThis * (CV.MS_TO_KPH if metric else CV.MS_TO_MPH))
+  message = f'Map Based Turn Adjustment \n Adjusting to {speed} {"km/h" if metric else "mph"} for turn in {round(distToTurnThis)} meters'
+  return Alert(
+    message,
+    "",
+    AlertStatus.normal, AlertSize.small,
+    Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 4.)
 
 
 EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
@@ -433,6 +470,33 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
       Priority.HIGH, VisualAlert.steerRequired, AudibleAlert.warningImmediate, .1),
   },
 
+  EventName.manualSteeringRequired: {
+    ET.WARNING: Alert(
+      "STEERING REQUIRED: AutoSteer OFF",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1, alert_rate=0.25),
+  },
+  EventName.preKeepHandsOnWheel: {
+    ET.WARNING: Alert(
+      "No hands on steering wheel detected",
+      "",
+      AlertStatus.userPrompt, AlertSize.small,
+      Priority.MID, VisualAlert.steerRequired, AudibleAlert.none, .1, alert_rate=0.75),
+  },
+
+  EventName.promptKeepHandsOnWheel: {
+    ET.WARNING: Alert(
+      "HANDS OFF STEERING WHEEL",
+      "Place hands on steering wheel",
+      AlertStatus.critical, AlertSize.mid,
+      Priority.MID, VisualAlert.steerRequired, AudibleAlert.promptDistracted, .1),
+  },
+
+  EventName.keepHandsOnWheel: {
+    ET.IMMEDIATE_DISABLE: ImmediateDisableAlert("Driver kept hands off sterring wheel"),
+  },
+
   EventName.manualRestart: {
     ET.WARNING: Alert(
       "TAKE CONTROL",
@@ -513,6 +577,36 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   # more often than expected.
   EventName.localizerMalfunction: {
     # ET.PERMANENT: NormalPermanentAlert("Sensor Malfunction", "Contact Support"),
+  },
+
+  EventName.speedLimitActive: {
+    ET.WARNING: Alert(
+      "Target set to speed limit",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, 2.),
+  },
+
+  EventName.speedLimitBelowCC: {
+    ET.WARNING: Alert(
+      "Max speed set below speed limit",
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 2.),
+  },
+
+
+
+  EventName.slowingForOSMCurve: {
+    ET.WARNING: OSM_Curve_Alert,
+  },
+
+  EventName.slowingForOSMCurveSound: {
+    ET.WARNING: OSM_Curve_Alert_Sound,
+  },
+
+  EventName.speedLimitValueChange: {
+    ET.WARNING: speed_limit_adjust_alert,
   },
 
   # ********** events that affect controls state transitions **********

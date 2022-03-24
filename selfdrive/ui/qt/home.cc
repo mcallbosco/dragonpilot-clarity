@@ -7,6 +7,7 @@
 
 #include "selfdrive/common/params.h"
 #include "selfdrive/ui/qt/util.h"
+#include "selfdrive/ui/qt/offroad/wifiManager.h"
 #include "selfdrive/ui/qt/widgets/drive_stats.h"
 #include "selfdrive/ui/qt/widgets/prime.h"
 
@@ -37,6 +38,12 @@ HomeWindow::HomeWindow(QWidget* parent) : QWidget(parent) {
   slayout->addWidget(driver_view);
   setAttribute(Qt::WA_NoSystemBackground);
   QObject::connect(uiState(), &UIState::offroadTransition, this, &HomeWindow::offroadTransition);
+  
+  if(Params().getBool("tetherOnRoad")){
+    WifiManager* wifi = new WifiManager(this);
+    wifi->setTetheringEnabled(false);
+  }
+  
 }
 
 void HomeWindow::showSidebar(bool show) {
@@ -63,6 +70,15 @@ void HomeWindow::showDriverView(bool show) {
 }
 
 void HomeWindow::mousePressEvent(QMouseEvent* e) {
+ // screen dim button (dm face icon)
+  if (uiState()->scene.started && uiState()->scene.screen_dim_touch_rect.ptInRect(e->x(), e->y())){
+    uiState()->scene.screen_dim_mode -= 1;
+    if (uiState()->scene.screen_dim_mode < 0){
+      uiState()->scene.screen_dim_mode = uiState()->scene.screen_dim_mode_max;
+    }
+    return;
+  }
+  
   // Handle sidebar collapsing
   if (onroad->isVisible() && (!sidebar->isVisible() || e->x() > sidebar->width())) {
     sidebar->setVisible(!sidebar->isVisible() && !onroad->isMapVisible());

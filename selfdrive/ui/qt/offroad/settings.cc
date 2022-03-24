@@ -65,12 +65,85 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
       "../assets/offroad/icon_road.png",
     },
+    {
+      "DisengageOnGas",
+      "Disengage openpilot On Gas Press",
+      "Disengage openpilot on gas pedal press.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "devUI",
+      "Enable Dev UI",
+      "Enables WN2's Dev UI",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "HandsOnWheelMonitoring",
+      "Enable Hands on Wheel Monitoring",
+      "Monitor and alert when driver is not keeping the hands on the steering wheel.",
+      "../assets/offroad/icon_openpilot.png",
+    },
+    {
+      "TurnVisionControl",
+      "Enable vision based turn control",
+      "Use vision path predictions to estimate the appropiate speed to drive through turns ahead.",
+      "../assets/offroad/icon_road.png",
+    },
+    {
+      "SpeedLimitControl",
+      "Enable Speed Limit Control",
+      "Use speed limit signs information from map data and car interface to automatically adapt cruise speed to road limits.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "SpeedLimitPercOffset",
+      "Enable Speed Limit Offset",
+      "Set speed limit slightly higher than actual speed limit for a more natural drive.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "TurnSpeedControl",
+      "Enable Map Data Turn Control",
+      "Use curvature info from map data to define speed limits to take turns ahead",
+      "../assets/offroad/icon_openpilot.png",
+    },
+    {
+      "ShowDebugUI",
+      "Show Road Name",
+      "Show road name on the bottom of the Onroad Screen.",
+      "../assets/offroad/icon_calibration.png",
+    },
+    {
+      "ShowMcallUI",
+      "Show Mcall UI",
+      "UI tweaks and enhancements by me!",
+      "../assets/offroad/icon_calibration.png",
+    },
+    {
+      "AudableMapD",
+      "Enable Audio Chimes for MapD Stuff",
+      "Enables audio chimes for a map based turn slowdown and if your CC is set below the speed limit!",
+      "../assets/offroad/icon_calibration.png",
+    },
+
+    {
+      "tetherOnRoad",
+      "Enable Automatic Tethering Onroad",
+      "This will not work if the device is connected to another wifi network. Hopefully I will fix this.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",
       "Show ETA in 24h format",
       "Use 24h format instead of am/pm",
       "../assets/offroad/icon_metric.png",
+    },
+    {
+      "ShowingMap",
+      "Show Map",
+      "Wanna show the map? Do this! It's for debug",
+      "../assets/offroad/icon_calibration.png",
     },
 #endif
 

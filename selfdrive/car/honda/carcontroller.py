@@ -96,7 +96,7 @@ def process_hud_alert(hud_alert):
 
 HUDData = namedtuple("HUDData",
                      ["pcm_accel", "v_cruise", "car",
-                      "lanes", "fcw", "acc_alert", "steer_required"])
+                     "lanes", "fcw", "acc_alert", "steer_required", "dashed_lanes"])
 
 
 class CarController:
@@ -138,7 +138,7 @@ class CarController:
     self.brake_last = rate_limit(pre_limit_brake, self.brake_last, -2., DT_CTRL)
 
     # vehicle hud display, wait for one update from 10Hz 0x304 msg
-    if hud_control.lanesVisible:
+    if hud_control.lanesVisible and CS.lkMode:
       hud_lanes = 1
     else:
       hud_lanes = 0
@@ -158,6 +158,9 @@ class CarController:
     # steer torque is converted back to CAN reference (positive when steering right)
     apply_steer = int(interp(-actuators.steer * self.params.STEER_MAX,
                              self.params.STEER_LOOKUP_BP, self.params.STEER_LOOKUP_V))
+
+    lkas_active = CC.latActive and CS.lkMode
+
 
     # Send CAN commands
     can_sends = []
@@ -230,7 +233,7 @@ class CarController:
           pump_on, self.last_pump_ts = brake_pump_hysteresis(apply_brake, self.apply_brake_last, self.last_pump_ts, ts)
 
           pcm_override = True
-          can_sends.append(hondacan.create_brake_command(self.packer, apply_brake, pump_on,
+          can_sends.append(hondacan.create_brake_command(self.packer, apply_brake,
                                                          pcm_override, pcm_cancel_cmd, fcw_display, idx,
                                                          self.CP.carFingerprint, CS.stock_brake))
           self.apply_brake_last = apply_brake
@@ -253,7 +256,7 @@ class CarController:
     if self.frame % 10 == 0:
       idx = (self.frame // 10) % 4
       hud = HUDData(int(pcm_accel), int(round(hud_v_cruise)), hud_car,
-                    hud_lanes, fcw_display, acc_alert, steer_required)
+                    hud_lanes, fcw_display, acc_alert, steer_required, CS.lkMode)
       can_sends.extend(hondacan.create_ui_commands(self.packer, self.CP, pcm_speed, hud, CS.is_metric, idx, CS.stock_hud))
 
       if self.CP.openpilotLongitudinalControl and self.CP.carFingerprint not in HONDA_BOSCH:

@@ -201,6 +201,7 @@ class Controls:
 
     self.events.add_from_msg(CS.events)
     self.events.add_from_msg(self.sm['driverMonitoringState'].events)
+    self.events.add_from_msg(self.sm['longitudinalPlan'].eventsDEPRECATED)
 
     # Create events for battery, temperature, disk space, and memory
     if EON and (self.sm['peripheralState'].pandaType != PandaType.uno) and \
@@ -544,7 +545,7 @@ class Controls:
         left_deviation = actuators.steer > 0 and dpath_points[0] < -0.20
         right_deviation = actuators.steer < 0 and dpath_points[0] > 0.20
 
-        if left_deviation or right_deviation:
+        if (left_deviation or right_deviation) and CS.lkMode:
           self.events.add(EventName.steerSaturated)
 
     # Ensure no NaNs/Infs
