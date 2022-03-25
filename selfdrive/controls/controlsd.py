@@ -97,7 +97,7 @@ class Controls:
     # see panda/board/safety_declarations.h for allowed values
     self.disengage_on_gas = Params().get_bool("DisengageOnGas")
     self.CP.alternativeExperience = 1 if not self.disengage_on_gas else 0
-    
+
     # read params
     self.is_metric = params.get_bool("IsMetric")
     self.is_ldw_enabled = params.get_bool("IsLdwEnabled")
@@ -493,7 +493,7 @@ class Controls:
     # Check which actuators can be enabled
     CC.latActive = self.active and not CS.steerFaultTemporary and not CS.steerFaultPermanent and \
                      CS.vEgo > self.CP.minSteerSpeed and not CS.standstill
-    CC.longActive = self.active
+    CC.longActive = self.active and not CS.gasPressed
 
     actuators = CC.actuators
     actuators.longControlState = self.LoC.long_control_state
