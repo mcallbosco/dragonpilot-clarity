@@ -159,7 +159,7 @@ class CarController:
     apply_steer = int(interp(-actuators.steer * self.params.STEER_MAX,
                              self.params.STEER_LOOKUP_BP, self.params.STEER_LOOKUP_V))
 
-    lkas_active = CC.latActive and CS.lkMode
+    CC.latActive = CC.longActive and CS.lkMode
 
 
     # Send CAN commands
