@@ -94,8 +94,10 @@ class Controls:
     get_one_can(self.can_sock)
 
     self.CI, self.CP = get_car(self.can_sock, self.pm.sock['sendcan'])
-    self.CP.alternativeExperience = 0  # see panda/board/safety_declarations.h for allowed values
-
+    # see panda/board/safety_declarations.h for allowed values
+    self.disengage_on_gas = Params().get_bool("DisengageOnGas")
+    self.CP.alternativeExperience = 1 if not self.disengage_on_gas else 0
+    
     # read params
     self.is_metric = params.get_bool("IsMetric")
     self.is_ldw_enabled = params.get_bool("IsLdwEnabled")
@@ -195,7 +197,7 @@ class Controls:
       return
 
     # Disable on rising edge of gas or brake. Also disable on brake when speed > 0
-    if (CS.gasPressed and not self.CS_prev.gasPressed) or \
+    if (CS.gasPressed and not self.CS_prev.gasPressed and self.disengage_on_gas) or \
       (CS.brakePressed and (not self.CS_prev.brakePressed or not CS.standstill)):
       self.events.add(EventName.pedalPressed)
 
