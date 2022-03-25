@@ -74,7 +74,6 @@ class CarInterfaceBase(ABC):
   def get_std_params(candidate, fingerprint):
     ret = car.CarParams.new_message()
     ret.carFingerprint = candidate
-    ret.alternativeExperience = 1 if Params().get_bool("DisengageOnGas") else 0  # see panda/board/safety_declarations.h for allowed values
 
     # standard ALC params
     ret.steerControlType = car.CarParams.SteerControlType.torque
