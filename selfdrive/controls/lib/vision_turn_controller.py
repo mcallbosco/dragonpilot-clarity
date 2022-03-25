@@ -4,7 +4,7 @@ from cereal import log
 from common.numpy_fast import interp
 from common.params import Params
 from common.realtime import sec_since_boot
-from selfdrive.config import Conversions as CV
+from common.conversions import Conversions as CV
 from selfdrive.controls.lib.lane_planner import TRAJECTORY_SIZE
 from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX
 
