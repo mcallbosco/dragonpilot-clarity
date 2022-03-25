@@ -33,6 +33,7 @@ class CarInterfaceBase(ABC):
     self.steering_unpressed = 0
     self.low_speed_alert = False
     self.silent_steer_warning = True
+    self.disengage_on_gas = Params().get_bool("DisengageOnGas")
 
     if CarState is not None:
       self.CS = CarState(CP)
@@ -73,6 +74,7 @@ class CarInterfaceBase(ABC):
   def get_std_params(candidate, fingerprint):
     ret = car.CarParams.new_message()
     ret.carFingerprint = candidate
+    ret.alternativeExperience = 1 if Params().get_bool("DisengageOnGas") else 0  # see panda/board/safety_declarations.h for allowed values
 
     # standard ALC params
     ret.steerControlType = car.CarParams.SteerControlType.torque
