@@ -66,12 +66,6 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_road.png",
     },
     {
-      "DisengageOnGas",
-      "Disengage openpilot On Gas Press",
-      "Disengage openpilot on gas pedal press.",
-      "../assets/offroad/icon_speed_limit.png",
-    },
-    {
       "devUI",
       "Enable Dev UI",
       "Enables WN2's Dev UI",
