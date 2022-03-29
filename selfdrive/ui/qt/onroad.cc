@@ -98,7 +98,7 @@ void OnroadWindow::mousePressEvent(QMouseEvent* e) {
   auto longitudinal_plan = sm["longitudinalPlan"].getLongitudinalPlan();
   const QRect speed_limit_touch_rect(bdr_s * 2, bdr_s * 1.5, 552, 202);
 
-  if (longitudinal_plan.getSpeedLimit() > 0.0 && speed_limit_touch_rect.contains(e->x(), e->y())) {
+  if (speed_limit_touch_rect.contains(e->x(), e->y())) {
     // If touching the speed limit sign area when visible
     uiState()->scene.last_speed_limit_sign_tap = seconds_since_boot();
     uiState()->scene.speed_limit_control_enabled = !uiState()->scene.speed_limit_control_enabled;
@@ -491,7 +491,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
     //Mcall Speed Limit
     configFont(p, "Open Sans", 48, "Regular");
-    drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 118, "LMT", slcActive && showSpeedLimit ? 200 : 100);
+    drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 118, "LMT", slcActive ? 200 : 100);
     if (showSpeedLimit) {
       if (slcActive) {
         p.setBrush(QColor(0, 0, 0, 100));
