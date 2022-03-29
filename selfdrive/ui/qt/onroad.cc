@@ -492,7 +492,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     //Mcall Speed Limit
     configFont(p, "Open Sans", 48, "Regular");
     drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 118, "LMT", slcActive ? 200 : 100);
-    if (showSpeedLimit) {
+    if (sstatus != STATUS_DISENGAGED && ShowSpeedLimit) {
       if (slcActive) {
         p.setBrush(QColor(0, 0, 0, 100));
         configFont(p, "Open Sans", 88, "Bold");
@@ -507,28 +507,32 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     }
 
 
+
+
     //Target Speed
     configFont(p, "Open Sans", 48, "Regular");
     drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*3)-(rc.width()/6), 118, "TRG", (is_cruise_set && status != STATUS_DISENGAGED) ? 200 : 100);
 
     //targetSpeedNumberCalc
-
+    
     int trgSpeed = 0;
-    if (showVTC){
-      configFont(p, "Open Sans", 88, "Bold");
-      trgSpeed = vtcSpeed.toInt();
-    } else if (tscActive && (maxSpeed >= turnSpeedLimit)){
-      configFont(p, "Open Sans", 88, "Bold");
-      trgSpeed = turnSpeedLimit.toInt();
-    } else if (showSpeedLimit && slcActive && maxSpeed >= speedLimit + speedLimitOffset) {
+    if (status != STATUS_DISENGAGED) {
+      if (showVTC){
         configFont(p, "Open Sans", 88, "Bold");
-        trgSpeed = speedLimit.toInt() + speedLimitOffset.toInt();
-    } else if (status != STATUS_DISENGAGED) {
-      configFont(p, "Open Sans", 88, "Bold");
-      trgSpeed = maxSpeed.toInt();
-    } else {
-      configFont(p, "Open Sans", 80, "SemiBold");
-      trgSpeed = 0;
+        trgSpeed = vtcSpeed.toInt();
+      } else if (tscActive && (maxSpeed >= turnSpeedLimit)){
+        configFont(p, "Open Sans", 88, "Bold");
+        trgSpeed = turnSpeedLimit.toInt();
+      } else if (showSpeedLimit && slcActive && maxSpeed >= speedLimit + speedLimitOffset) {
+          configFont(p, "Open Sans", 88, "Bold");
+          trgSpeed = speedLimit.toInt() + speedLimitOffset.toInt();
+      } else if (status != STATUS_DISENGAGED) {
+        configFont(p, "Open Sans", 88, "Bold");
+        trgSpeed = maxSpeed.toInt();
+      } else {
+        configFont(p, "Open Sans", 80, "SemiBold");
+        trgSpeed = 0;
+      }
     }
     if (is_cruise_set && trgSpeed != 0) {
       configFont(p, "Open Sans", 88, "Bold");

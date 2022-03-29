@@ -290,6 +290,15 @@ def OSM_Curve_Alert(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, so
     AlertStatus.normal, AlertSize.small,
     Priority.LOW, VisualAlert.none, AudibleAlert.none, 4.)
 
+def Speed_Under_Set(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
+  speedLimit = sm['longitudinalPlan'].speedLimit
+  speed = round(speedLimit * (CV.MS_TO_KPH if metric else CV.MS_TO_MPH))
+  message = f'Set Speed Below Speed Limit of {speed} {"km/h" if metric else "mph"}'
+  return Alert(
+    message,
+    "",
+    AlertStatus.normal, AlertSize.small,
+    Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 4.)
   
 def OSM_Curve_Alert_Sound(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:
   turnSpeedThis = sm['longitudinalPlan'].turnSpeed
@@ -588,13 +597,8 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.speedLimitBelowCC: {
-    ET.WARNING: Alert(
-      "Max speed set below speed limit",
-      "",
-      AlertStatus.normal, AlertSize.small,
-      Priority.LOW, VisualAlert.none, AudibleAlert.prompt, 2.),
+    ET.WARNING: Speed_Under_Set,
   },
-
 
 
   EventName.slowingForOSMCurve: {
