@@ -3,6 +3,7 @@ from collections import defaultdict
 from cereal import car
 from common.conversions import Conversions as CV
 from common.numpy_fast import interp
+from common.params import Params
 from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
 from selfdrive.car.interfaces import CarStateBase
@@ -302,6 +303,9 @@ class CarState(CarStateBase):
         if self.lkMode:
           self.lkMode = False
         else:
+          self.lkMode = True
+      if Params().get_bool('ACCdoesLKAS'):
+        if not self.prev_cruise_enabled and ret.cruiseState.enabled:
           self.lkMode = True
 
     self.prev_cruise_setting = self.cruise_setting

@@ -126,6 +126,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "This will not work if the device is connected to another wifi network. Hopefully I will fix this.",
       "../assets/offroad/icon_speed_limit.png",
     },
+    {
+      "ACCdoesLKAS",
+      "Reenable LKA When Activating Openpilot"
+      "If you disable Lane Keep Assist this will reenable it when openpilot has been turned off and on.",
+      "../assets/offroad/icon_speed_limit.png",
+    }
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",
