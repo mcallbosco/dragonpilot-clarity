@@ -492,7 +492,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     //Mcall Speed Limit
     configFont(p, "Open Sans", 48, "Regular");
     drawText(p, rc.center().x()-(rc.width()/2)+((rc.width()/3)*2)-(rc.width()/6), 118, "LMT", slcActive ? 200 : 100);
-    if (sstatus != STATUS_DISENGAGED && ShowSpeedLimit) {
+    if (sstatus != STATUS_DISENGAGED && showSpeedLimit) {
       if (slcActive) {
         p.setBrush(QColor(0, 0, 0, 100));
         configFont(p, "Open Sans", 88, "Bold");
