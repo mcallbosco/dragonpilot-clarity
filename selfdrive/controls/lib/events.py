@@ -357,11 +357,11 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   # ********** events only containing alerts that display while engaged **********
 
   EventName.gasPressed: {
-    ET.WARNING: Alert(
-      "Release Accelerator Pedal to Engage",
+    ET.PRE_ENABLE: Alert(
+      "Release Gas Pedal to Engage",
       "",
       AlertStatus.normal, AlertSize.small,
-      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1, creation_delay=1.),
   },
 
   # openpilot tries to learn certain parameters about your car by observing
