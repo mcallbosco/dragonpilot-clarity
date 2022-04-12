@@ -77,6 +77,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Disabled the noise for the Steering Disabled Alerts if you are overriding the wheel!",
       "../assets/offroad/icon_calibration.png",
     },
+    {
+      "HigherMaxAccel",
+      "Higher Accel Limit",
+      "Cruise tuned to allow a bit more acceleration than stock.",
+      "../assets/offroad/icon_openpilot.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",
