@@ -71,6 +71,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       tr("<b>WARNING: openpilot longitudinal control is experimental for this car and will disable AEB.</b>"),
       "../assets/offroad/icon_speed_limit.png",
     },
+    {
+      "Quiet_Steer_Alert",
+      "Quiet Steering Disable Alerts on Override",
+      "Disabled the noise for the Steering Disabled Alerts if you are overriding the wheel!",
+      "../assets/offroad/icon_calibration.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",
