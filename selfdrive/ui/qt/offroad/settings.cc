@@ -89,6 +89,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Set the stop distance to be longer. May cause braking on engagement",
       "../assets/offroad/icon_calibration.png",
     },
+    {
+      "e2eLongButtonToggle",
+      "Enable e2e toggle on Steering Wheel",
+      "Use distance button to toggle e2e",
+      "../assets/offroad/icon_calibration.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",

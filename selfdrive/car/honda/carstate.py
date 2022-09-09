@@ -3,6 +3,7 @@ from collections import defaultdict
 from cereal import car
 from common.conversions import Conversions as CV
 from common.numpy_fast import interp
+from common.params import Params
 from opendbc.can.can_define import CANDefine
 from opendbc.can.parser import CANParser
 from selfdrive.car.honda.hondacan import get_pt_bus
@@ -277,6 +278,11 @@ class CarState(CarStateBase):
     if self.CP.carFingerprint in (CAR.PILOT, CAR.PASSPORT, CAR.RIDGELINE):
       if ret.brake > 0.1:
         ret.brakePressed = True
+
+    if self.cruise_setting == 3:
+      if cp.vl["SCM_BUTTONS"]["CRUISE_SETTING"] == 0:
+        if Params().get_bool('e2eLongButtonToggle'):
+          Params().put_bool('EndToEndLong', not (Params().get_bool('EndToEndLong')))
 
     if self.CP.carFingerprint in HONDA_BOSCH:
       # TODO: find the radarless AEB_STATUS bit and make sure ACCEL_COMMAND is correct to enable AEB alerts
