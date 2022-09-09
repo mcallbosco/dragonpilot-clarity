@@ -2,6 +2,7 @@
 import os
 import numpy as np
 
+from cereal import car
 from common.realtime import sec_since_boot
 from common.numpy_fast import clip
 from system.swaglog import cloudlog
@@ -55,6 +56,8 @@ MAX_ACCEL = 2.0
 T_FOLLOW = 1.45
 COMFORT_BRAKE = 2.5
 STOP_DISTANCE = 6.0
+if (car.params().get_bool('LongStopDist')):
+  STOP_DISTANCE = 7.0
 
 def get_stopped_equivalence_factor(v_lead):
   return (v_lead**2) / (2 * COMFORT_BRAKE)

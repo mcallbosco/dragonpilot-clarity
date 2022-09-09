@@ -83,6 +83,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Cruise tuned to allow a bit more acceleration than stock.",
       "../assets/offroad/icon_openpilot.png",
     },
+    {
+      "LongStopDist",
+      "Long Stop Distance",
+      "Set the stop distance to be longer. May cause braking on engagement",
+      "../assets/offroad/icon_calibration.png",
+    },
 #ifdef ENABLE_MAPS
     {
       "NavSettingTime24h",

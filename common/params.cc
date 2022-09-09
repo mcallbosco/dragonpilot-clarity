@@ -187,6 +187,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"Offroad_UpdateFailed", CLEAR_ON_MANAGER_START},
     {"Quiet_Steer_Alert", PERSISTENT},
     {"HigherMaxAccel", PERSISTENT},
+    {"LongStopDist", PERSISTENT},
 };
 
 } // namespace
