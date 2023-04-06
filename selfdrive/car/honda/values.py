@@ -97,6 +97,7 @@ class CAR:
   RIDGELINE = "HONDA RIDGELINE 2017"
   INSIGHT = "HONDA INSIGHT 2019"
   HONDA_E = "HONDA E 2020"
+  CLARITY = "HONDA CLARITY 2018"
 
 
 class Footnote(Enum):
@@ -140,8 +141,22 @@ CAR_INFO: Dict[str, Optional[Union[HondaCarInfo, List[HondaCarInfo]]]] = {
   CAR.RIDGELINE: HondaCarInfo("Honda Ridgeline 2017-22", harness=Harness.nidec),
   CAR.INSIGHT: HondaCarInfo("Honda Insight 2019-21", "All", min_steer_speed=3. * CV.MPH_TO_MS, harness=Harness.bosch),
   CAR.HONDA_E: HondaCarInfo("Honda e 2020", "All", min_steer_speed=3. * CV.MPH_TO_MS, harness=Harness.bosch),
+  CAR.CLARITY: HondaCarInfo("Honda Clarity", harness=Harness.nidec),
+}
+# diag message that in some Nidec cars only appear with 1s freq if VIN query is performed
+DIAG_MSGS = {1600: 5, 1601: 8}
+
+FINGERPRINTS = {
+  CAR.CLARITY: [{
+    57: 3, 148: 8, 228: 5, 304: 8, 312: 8, 315: 7, 330: 8, 344: 8, 380: 8, 387: 8, 388: 8, 399: 7, 409: 8, 419: 8, 420: 8, 427: 3, 428: 8, 432: 7, 441: 5, 450: 8, 464: 8, 476: 8, 478: 3, 490: 8, 506: 8, 531: 8, 533: 8, 538: 5, 545: 5, 547: 6, 559: 3, 597: 8, 662: 4, 773: 7, 777: 8, 780: 8, 795: 8, 800: 8, 804: 8, 806: 8, 808: 8, 815: 8, 829: 5, 831: 5, 832: 3, 833: 8, 856: 7, 862: 8, 884: 8, 891: 8, 892: 8, 900: 8, 901: 8, 904: 8, 905: 8, 906: 4, 923: 2, 927: 8, 929: 8, 976: 8, 983: 8, 985: 3, 1024: 5, 1027: 5, 1029: 8, 1036: 8, 1039: 8, 1070: 8, 1072: 4, 1092: 1, 1108: 8, 1113: 8, 1114: 2, 1125: 8, 1128: 8, 1129: 8, 1302: 8, 1322: 5, 1331: 8, 1332: 5, 1341: 5, 1361: 5, 1365: 5, 1424: 5, 1429: 5, 1600: 5, 1601: 8, 1604: 5, 1606: 5, 1607: 8, 1608: 5, 1609: 8, 1633: 8
+  }],
 }
 
+# add DIAG_MSGS to fingerprints
+for c in FINGERPRINTS:
+  for f, _ in enumerate(FINGERPRINTS[c]):
+    for d in DIAG_MSGS:
+      FINGERPRINTS[c][f][d] = DIAG_MSGS[d]
 
 FW_VERSIONS = {
   CAR.ACCORD: {
@@ -1397,6 +1412,31 @@ FW_VERSIONS = {
       b'57114-TYF-E030\x00\x00'
     ],
   },
+    CAR.CLARITY: {
+    (Ecu.shiftByWire, 0x18da0bf1, None): [
+        b'54008-TRW-A910\x00\x00',
+    ],
+    (Ecu.vsa, 0x18da28f1, None): [
+        b'57114-TRW-A010\x00\x00',
+        b'57114-TRW-A020\x00\x00',
+    ],
+    (Ecu.eps, 0x18da30f1, None): [
+        b'39990-TRW-A020\x00\x00',
+        b'39990-TRW,A020\x00\x00', #modified firmware
+        b'39990,TRW,A020\x00\x00', #modified firmware 3x
+    ],
+    (Ecu.srs, 0x18da53f1, None): [
+        b'77959-TRW-A210\x00\x00',
+        b'77959-TRW-A220\x00\x00',
+    ],
+    (Ecu.gateway, 0x18daeff1, None): [
+        b'38897-TRW-A010\x00\x00',
+    ],
+    (Ecu.combinationMeter, 0x18da60f1, None): [
+        b'78109-TRW-A020\x00\x00',
+        b'78109-TRW-A030\x00\x00',
+    ],
+  },
 }
 
 DBC = {
@@ -1422,6 +1462,7 @@ DBC = {
   CAR.RIDGELINE: dbc_dict('acura_ilx_2016_can_generated', 'acura_ilx_2016_nidec'),
   CAR.INSIGHT: dbc_dict('honda_insight_ex_2019_can_generated', None),
   CAR.HONDA_E: dbc_dict('acura_rdx_2020_can_generated', None),
+  CAR.CLARITY: dbc_dict('honda_clarity_hybrid_2018_can_generated', 'acura_ilx_2016_nidec'),
 }
 
 STEER_THRESHOLD = {
