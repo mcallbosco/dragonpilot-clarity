@@ -1,0 +1,4 @@
+[submodule "panda"]
+	path = panda
+	url = https://github.com/mcallbosco/panda.git
+	branch = stock-honda-clarity
