@@ -124,6 +124,7 @@ def create_ui_commands(packer, CP, enabled, pcm_speed, hud, is_metric, acc_hud, 
       acc_hud_values['FCM_OFF'] = 1
       acc_hud_values['FCM_OFF_2'] = 1
     else:
+      acc_hud_values['ACC_ON'] = int(enabled)
       acc_hud_values['PCM_SPEED'] = pcm_speed * CV.MS_TO_KPH
       acc_hud_values['PCM_GAS'] = hud.pcm_accel
       acc_hud_values['SET_ME_X01'] = 1
