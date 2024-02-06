@@ -51,7 +51,6 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     parkBrake @29;
     manualRestart @30;
     lowSpeedLockout @31;
-    plannerError @32;
     joystickDebug @34;
     steerTempUnavailableSilent @35;
     resumeRequired @36;
@@ -142,6 +141,7 @@ struct CarEvent @0x9b1657f34caf3ad3 {
     startupFuzzyFingerprintDEPRECATED @97;
     noTargetDEPRECATED @25;
     brakeUnavailableDEPRECATED @2;
+    plannerErrorDEPRECATED @32;
   }
 }
 
@@ -484,6 +484,7 @@ struct CarParams {
   openpilotLongitudinalControl @37 :Bool; # is openpilot doing the longitudinal control?
   carVin @38 :Text; # VIN number queried during fingerprinting
   dashcamOnly @41: Bool;
+  passive @73: Bool;   # is openpilot in control?
   transmissionType @43 :TransmissionType;
   carFw @44 :List(CarFw);
 
